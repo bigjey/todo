@@ -1,7 +1,6 @@
 'use strict';
 
-var globalId = 0,
-    keys = {
+var keys = {
       ENTER: 13,
       ESC: 27
     };
@@ -213,8 +212,7 @@ TodoList.prototype.toJSON = function(){
   foreach(this.items, function(item){
     items.push({
       title: item.title,
-      done: item.done,
-      id: item.id
+      done: item.done      
     })
   })
   return items;
@@ -225,8 +223,7 @@ TodoList.prototype.toJSON = function(){
 function TodoItem(title, done){
 
   this.title = title || 'new todo';
-  this.done = done || false;
-  this.id = ++globalId;
+  this.done = done || false;  
 
   this.init();
 }
