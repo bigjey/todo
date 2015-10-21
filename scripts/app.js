@@ -20,7 +20,8 @@ TodoList.prototype.init = function(){
 
   this.list = this.el.querySelector('.todo-list');
 
-	this.getFromStorage();
+  this.getFromStorage();
+  
   this.addAll();
 
   this.main = this.el.querySelector('.main');
@@ -39,9 +40,9 @@ TodoList.prototype.init = function(){
 }
 
 TodoList.prototype.update = function(){
-	
-	this.main.style.display = this.items.length ? 'block' : 'none';
-	this.footer.style.display = this.items.length ? 'block' : 'none';
+  
+  this.main.style.display = this.items.length ? 'block' : 'none';
+  this.footer.style.display = this.items.length ? 'block' : 'none';
   
   this.updateFooter();
   this.checkToggleAllInput();
@@ -57,52 +58,52 @@ TodoList.prototype.bindEvents = function(){
 }
 
 TodoList.prototype.applyFilter = function(){
-	var hash = window.location.hash || '#/',
-			self = this;
+  var hash = window.location.hash || '#/',
+      self = this;
 
-	var selected = this.filter.querySelector('a.selected');	
-	if (selected)
-		removeClass(selected, 'selected');
-	
-	var newSelected = this.filter.querySelector('a[href="'+hash+'"]');
-	if (newSelected){
-		addClass(newSelected, 'selected');
-	}
+  var selected = this.filter.querySelector('a.selected'); 
+  if (selected)
+    removeClass(selected, 'selected');
+  
+  var newSelected = this.filter.querySelector('a[href="'+hash+'"]');
+  if (newSelected){
+    addClass(newSelected, 'selected');
+  }
 
-	switch(hash){
-		case '#/':
-			foreach(self.items, function(item){
-				removeClass(item.element, 'hidden');
-			})
-			break;
-		case '#/active':
-			foreach(self.items, function(item){
-				if (!item.done)
-					removeClass(item.element, 'hidden');
-				else
-					addClass(item.element, 'hidden');
-			})
-			break;
-		case '#/completed':
-			foreach(self.items, function(item){
-				if (item.done)
-					removeClass(item.element, 'hidden');
-				else
-					addClass(item.element, 'hidden');
-			})
-			break;
-		default:
-			console.log('unknown route, use one of #/, #/active, #/completed');
-	}
+  switch(hash){
+    case '#/':
+      foreach(self.items, function(item){
+        removeClass(item.element, 'hidden');
+      })
+      break;
+    case '#/active':
+      foreach(self.items, function(item){
+        if (!item.done)
+          removeClass(item.element, 'hidden');
+        else
+          addClass(item.element, 'hidden');
+      })
+      break;
+    case '#/completed':
+      foreach(self.items, function(item){
+        if (item.done)
+          removeClass(item.element, 'hidden');
+        else
+          addClass(item.element, 'hidden');
+      })
+      break;
+    default:
+      console.log('unknown route, use one of #/, #/active, #/completed');
+  }
 
-	self.update();
-	
+  self.update();
+  
 }
 
 TodoList.prototype.newItemHandler = function(e){
   var input = e.currentTarget;
   if (e.keyCode == keys.ENTER){
-  	if (input.value == '') return;
+    if (input.value == '') return;
     this.addItem(new TodoItem(input.value));
     this.saveToStorage();
     input.value = '';
@@ -118,7 +119,7 @@ TodoList.prototype.toggleAllHandler = function(e){
 
   foreach(this.items, function(item, i){
     if (!hasClass(item.element, 'hidden')){
-    	item.setStatus(newStatus);
+      item.setStatus(newStatus);
     }
   })
 
@@ -128,7 +129,7 @@ TodoList.prototype.toggleAllHandler = function(e){
 TodoList.prototype.clearCompletedHandler = function(e){
   var self = this;  
   for(var i = 0; i < self.items.length; i++){
-  	var item = self.items[i];
+    var item = self.items[i];
     if (item.done){
       self.removeItem(item);
       i--;
@@ -308,5 +309,5 @@ TodoItem.prototype.render = function(){
 }
 
 foreach(document.querySelectorAll('[data-todo-list]'), function(container){
-	new TodoList(container);
+  new TodoList(container);
 })
