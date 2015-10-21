@@ -5,6 +5,7 @@ var globalId = 0,
       ENTER: 13,
       ESC: 27
     };
+    
 
 // TodoList
 function TodoList(container){
@@ -158,10 +159,3 @@ TodoItem.prototype.render = function(){
 }
 
 var todoList1 = new TodoList('todoList1');
-
-/*
-todoList1.addItem(new TodoItem('first todo'));
-todoList1.addItem(new TodoItem('2 todo'));
-todoList1.addItem(new TodoItem('3 todo'));
-
-console.log(todoList1.items);*/
