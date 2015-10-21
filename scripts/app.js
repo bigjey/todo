@@ -9,23 +9,29 @@ var globalId = 0,
 
 // TodoList
 function TodoList(container){
-  this.containerId = container;
+  this.el = container;
   this.items = [];
-  this.el = document.getElementById(this.containerId);
-  this.list = this.el.querySelector('.todo-list');
 
   this.init();
 
 }
 
 TodoList.prototype.init = function(){
-  this.getFromStorage();
+
+  this.list = this.el.querySelector('.todo-list');
+
+	this.getFromStorage();
   this.addAll();
 
+  this.main = this.el.querySelector('.main');
+  this.footer = this.el.querySelector('.footer');
+  
   this.toggleAllInput = this.el.querySelector('input.toggle-all');
   this.newItemInput = this.el.querySelector('input.new-todo');
   this.todoCount = this.el.querySelector('.todo-count');
   this.clearCompletedButton = this.el.querySelector('button.clear-completed');
+  this.filter = this.el.querySelector('.filters');
+  this.filters = this.el.querySelector('.filters a');
 
   this.update();
 
@@ -33,6 +39,10 @@ TodoList.prototype.init = function(){
 }
 
 TodoList.prototype.update = function(){
+	
+	this.main.style.display = this.items.length ? 'block' : 'none';
+	this.footer.style.display = this.items.length ? 'block' : 'none';
+  
   this.updateFooter();
   this.checkToggleAllInput();
 }
@@ -41,17 +51,65 @@ TodoList.prototype.bindEvents = function(){
   this.newItemInput.addEventListener('keydown', this.newItemHandler.bind(this));
   this.toggleAllInput.addEventListener('change', this.toggleAllHandler.bind(this));
   this.clearCompletedButton.addEventListener('click', this.clearCompletedHandler.bind(this));
+
+  window.addEventListener('load', this.applyFilter.bind(this));
+  window.addEventListener('hashchange', this.applyFilter.bind(this));
+}
+
+TodoList.prototype.applyFilter = function(){
+	var hash = window.location.hash || '#/',
+			self = this;
+
+	var selected = this.filter.querySelector('a.selected');	
+	if (selected)
+		removeClass(selected, 'selected');
+	
+	var newSelected = this.filter.querySelector('a[href="'+hash+'"]');
+	if (newSelected){
+		addClass(newSelected, 'selected');
+	}
+
+	switch(hash){
+		case '#/':
+			foreach(self.items, function(item){
+				removeClass(item.element, 'hidden');
+			})
+			break;
+		case '#/active':
+			foreach(self.items, function(item){
+				if (!item.done)
+					removeClass(item.element, 'hidden');
+				else
+					addClass(item.element, 'hidden');
+			})
+			break;
+		case '#/completed':
+			foreach(self.items, function(item){
+				if (item.done)
+					removeClass(item.element, 'hidden');
+				else
+					addClass(item.element, 'hidden');
+			})
+			break;
+		default:
+			console.log('unknown route, use one of #/, #/active, #/completed');
+	}
+
+	self.update();
+	
 }
 
 TodoList.prototype.newItemHandler = function(e){
   var input = e.currentTarget;
   if (e.keyCode == keys.ENTER){
+  	if (input.value == '') return;
     this.addItem(new TodoItem(input.value));
     this.saveToStorage();
     input.value = '';
     this.update();
     this.saveToStorage();
   }
+  this.applyFilter();
 }
 
 TodoList.prototype.toggleAllHandler = function(e){
@@ -59,29 +117,41 @@ TodoList.prototype.toggleAllHandler = function(e){
       newStatus = input.checked;
 
   foreach(this.items, function(item, i){
-    item.setStatus(newStatus);
+    if (!hasClass(item.element, 'hidden')){
+    	item.setStatus(newStatus);
+    }
   })
+
+  this.applyFilter();
 }
 
 TodoList.prototype.clearCompletedHandler = function(e){
-  var self = this;
-  console.log(self.items.length, self.items);
-  foreach(this.items, function(item, i){
+  var self = this;  
+  for(var i = 0; i < self.items.length; i++){
+  	var item = self.items[i];
     if (item.done){
       self.removeItem(item);
-      console.log(self.items.length, i, self.items);
+      i--;
     }
-  })
+  }
 }
 
 TodoList.prototype.checkToggleAllInput = function(){
-  this.toggleAllInput.checked = this.getDoneCount() == this.items.length;
+  this.toggleAllInput.checked = this.getDoneCount() == this.getVisibleCount() && this.getVisibleCount() != 0;
 }
 
 TodoList.prototype.getDoneCount = function(){
   var count = 0;
   foreach(this.items, function(item, i){
     if (item.done) count++;
+  })
+  return count;
+}
+
+TodoList.prototype.getVisibleCount = function(){
+  var count = 0;
+  foreach(this.items, function(item, i){
+    if (!hasClass(item.element, 'hidden')) count++;
   })
   return count;
 }
@@ -94,7 +164,7 @@ TodoList.prototype.addItem = function(item){
 
 TodoList.prototype.removeItem = function(item){
   var index = this.items.indexOf(item);
-  console.log(index + ' to remove');
+  
   this.items.splice(index, 1);
   item.element.remove();
   this.update();
@@ -222,7 +292,7 @@ TodoItem.prototype.setStatus = function(newStatus){
   this.done = newStatus;
   this.toggleInput.checked = this.done;
 
-  this.listInstance.update();
+  this.listInstance.applyFilter();
   this.listInstance.saveToStorage();
 }
 
@@ -237,4 +307,6 @@ TodoItem.prototype.render = function(){
   ";
 }
 
-var todoList1 = new TodoList('todoList1');
+foreach(document.querySelectorAll('[data-todo-list]'), function(container){
+	new TodoList(container);
+})
