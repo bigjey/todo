@@ -1,26 +1,31 @@
-'use strict';
+var helpers = (function(){
 
-function foreach(elements, callback){
-  Array.prototype.forEach.call(elements, callback);
-}
+  'use strict';
 
-function hasClass(el, className){
-  if (el.classList)
-    return el.classList.contains(className);
-  else
-    return new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
-}
+  var self = {};
 
-function addClass(el, className){
-  if (el.classList)
-    el.classList.add(className);
-  else
-    el.className += ' ' + className;
-}
+  self.hasClass = function(el, className){    
+    if (el.classList)
+      return el.classList.contains(className);
+    else
+      return new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
+  
+  };
 
-function removeClass(el, className){
-  if (el.classList)
-    el.classList.remove(className);
-  else
-    el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-}
+  self.addClass = function(el, className){
+    if (el.classList)
+      el.classList.add(className);
+    else
+      el.className += ' ' + className;
+  }
+
+  self.removeClass = function(el, className){
+    if (el.classList)
+      el.classList.remove(className);
+    else
+      el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+  }
+
+  return self;
+
+})();
