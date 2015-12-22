@@ -160,13 +160,18 @@ TodoList.prototype.fill = function(){
   var self = this;
   var items = this.fetch();  
   var maxId = 0;
+  var tempHTML = '';
   if (items){
+    
     items.forEach(function(item){
       if (item.id > maxId) maxId = item.id;
       var todoItem = new TodoItem(item.title, item.done, item.id);
-      self.addItem(todoItem);
+      self.addItem(todoItem, false);
+      
+      tempHTML += todoItem.element.outerHTML;
     })
     
+    this.list.innerHTML = tempHTML;    
     this.globalID = maxId;
     
   }  
@@ -238,7 +243,7 @@ TodoList.prototype.newItemHandler = function(e){
   if (e.keyCode == keys.ENTER){
     if (input.value == '') return;
     
-    this.addItem(new TodoItem(input.value, false, this.nextID(0)));    
+    this.addItem(new TodoItem(input.value, false, this.nextID()), false);    
     input.value = '';
 
     this.render();
@@ -294,7 +299,7 @@ TodoList.prototype.getVisibleCount = function(){
   return count;
 }
 
-TodoList.prototype.addItem = function(item){
+TodoList.prototype.addItem = function(item, append){
 
   this.items.push(item);
   this.list.appendChild(item.element);
@@ -308,7 +313,7 @@ TodoList.prototype.removeItem = function(item){
   
   this.items.splice(index, 1);  
 
-  var li = item.element;
+  var li = this.list.children[index];
   var ul = li.parentNode;  
 
   ul.removeChild(li);
