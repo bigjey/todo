@@ -162,7 +162,7 @@ TodoList.prototype.fill = function(){
   var maxId = 0;
   var tempHTML = '';
   if (items){
-    
+
     items.forEach(function(item){
       if (item.id > maxId) maxId = item.id;
       var todoItem = new TodoItem(item.title, item.done, item.id);
@@ -302,7 +302,10 @@ TodoList.prototype.getVisibleCount = function(){
 TodoList.prototype.addItem = function(item, append){
 
   this.items.push(item);
-  this.list.appendChild(item.element);
+
+  if (append){
+    this.list.appendChild(item.element);    
+  }
 
   item.listInstance = this;
 }
